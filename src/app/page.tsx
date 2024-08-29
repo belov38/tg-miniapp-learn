@@ -5,8 +5,14 @@ import {useTelegram} from "@/providers/telegram-provider";
 export default function Home() {
     const {webApp, user} = useTelegram()
 
-    webApp?.MainButton.show();
     webApp?.enableClosingConfirmation();
+    webApp?.BackButton.show();
+    webApp?.SettingsButton.show();
+    webApp?.BackButton.onClick(() => {
+        webApp?.BackButton.hide();
+        webApp?.sendData('/somecommand')
+    });
+    webApp?.MainButton.show();
     webApp?.MainButton.onClick(() => {webApp?.close()});
     return (
         <main>
