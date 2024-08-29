@@ -13,11 +13,13 @@ export default function Home() {
         webApp?.sendData('/somecommand')
     });
     webApp?.MainButton.show();
-    webApp?.MainButton.onClick(() => {webApp?.close()});
+    webApp?.MainButton.onClick(() => {
+        webApp?.sendData('/somecommand2')
+    });
     return (
         <main>
             <h1>TG WEB App</h1>
-            <>{JSON.stringify(user, null, 2)}</>
+            <pre>{JSON.stringify(user, null, 2)}</pre>
         </main>
     );
 }
