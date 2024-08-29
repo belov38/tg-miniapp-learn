@@ -21,8 +21,18 @@ export default function Home() {
             <h1>TG WEB App</h1>
             <pre>{JSON.stringify(user, null, 2)}</pre>
             <div className="card">
-                <button onClick={() => webApp?.showAlert("Ура")}>Send command</button>
+                <button onClick={() => webApp?.showAlert("Ура")}>Alert</button>
+            </div>
+            <div>
+                <button onClick={() => webApp?.showPopup({
+                    title: "Pop up",
+                    message: "hello world",
+
+                }, () => {
+
+                })}>Pop up
+                </button>
             </div>
         </main>
-);
+    );
 }
