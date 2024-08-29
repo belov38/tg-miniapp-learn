@@ -21,7 +21,7 @@ export default function Home() {
             <h1>TG WEB App</h1>
             <pre>{JSON.stringify(user, null, 2)}</pre>
             <div className="card">
-                <button onClick={() => webApp?.sendData('/somecommand3')}>Send command</button>
+                <button onClick={() => webApp?.showAlert("Ура")}>Send command</button>
             </div>
         </main>
 );
