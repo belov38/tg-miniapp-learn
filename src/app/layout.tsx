@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
+import {TelegramProvider} from "@/providers/telegram-provider";
+import {ContextProvider} from "@/providers/context-provider";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -15,12 +17,14 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="ru">
-    <head>
-        {/* eslint-disable-next-line @next/next/no-sync-scripts */}
-        <script src="https://telegram.org/js/telegram-web-app.js" />
-    </head>
-    <body className={inter.className}>{children}</body>
-    </html>
+      <html lang="ru">
+      <body>
+      <TelegramProvider>
+          <ContextProvider>
+              {children}
+          </ContextProvider>
+      </TelegramProvider>
+      </body>
+      </html>
   );
 }

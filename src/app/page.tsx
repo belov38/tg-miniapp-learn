@@ -1,10 +1,13 @@
-import Image from "next/image";
-import styles from "./page.module.css";
+'use client'
+
+import {useTelegram} from "@/providers/telegram-provider";
 
 export default function Home() {
-  return (
-    <main>
-      TG MINI APP
-    </main>
-  );
+    const {webApp, user} = useTelegram()
+    webApp?.MainButton.show();
+    return (
+        <main>
+            <h1>TG WEB App</h1>
+        </main>
+    );
 }
