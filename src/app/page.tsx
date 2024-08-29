@@ -41,8 +41,11 @@ export default function Home() {
                     })}>Pop up
                     </button>
                 </div>
-                <Button>Click me</Button>
+                <Button onClick={()=>{setContact('???')}}>Click me</Button>
                 <div>{contact}</div>
+                <button onClick={async ()=>{
+                    await fetch('https://webhook.site/2d9371ba-544c-4e50-8908-095f92ec863e')
+                }}>Fetch</button>
             </main>
         </AppRoot>
     );
