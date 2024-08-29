@@ -1,7 +1,7 @@
 'use client'
 
 import {useTelegram} from "@/providers/telegram-provider";
-
+import { Button } from '@telegram-apps/telegram-ui';
 export default function Home() {
     const {webApp, user} = useTelegram()
 
@@ -33,6 +33,7 @@ export default function Home() {
                 })}>Pop up
                 </button>
             </div>
+            <Button>Click me</Button>
         </main>
     );
 }
