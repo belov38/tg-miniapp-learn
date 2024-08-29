@@ -17,7 +17,7 @@ export default function Home() {
     return (
         <main>
             <h1>TG WEB App</h1>
-            <div>{user?.id}</div>
+            <>{JSON.stringify(user, null, 2)}</>
         </main>
     );
 }
