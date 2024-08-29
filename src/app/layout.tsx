@@ -15,7 +15,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="ru" style="background-color: var(--color-bg-secondary);">
+    <html lang="ru">
     <head>
         {/* eslint-disable-next-line @next/next/no-sync-scripts */}
         <script src="https://telegram.org/js/telegram-web-app.js"></script>

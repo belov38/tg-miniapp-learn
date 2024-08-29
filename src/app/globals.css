@@ -1,0 +1,7 @@
+:root {
+    --color-bg-secondary: #your-color-here;
+}
+
+html {
+    background-color: var(--color-bg-secondary);
+}
