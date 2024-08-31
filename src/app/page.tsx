@@ -18,7 +18,7 @@ export default function Home() {
             mainButton?.setText('hello world')
                 .on('click', clickHandler)
             mainButton?.show()
-            mainButton?.enabled()
+            mainButton?.enable()
         }
 
         return () => {
