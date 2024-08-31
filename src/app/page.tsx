@@ -1,7 +1,7 @@
 'use client';
 
 import {Section, Cell, Image, List, Text, Card, } from '@telegram-apps/telegram-ui';
-import {useViewport, useHapticFeedback} from '@telegram-apps/sdk-react';
+import {useViewport, useHapticFeedback, useInitDataRaw} from '@telegram-apps/sdk-react';
 
 import { Link } from '@/components/Link/Link';
 import { useMainButton } from '@telegram-apps/sdk-react';
@@ -14,7 +14,7 @@ function Home() {
   const viewPort = useViewport();
   const hf = useHapticFeedback()
 
-
+  const initDataRaw = useInitDataRaw()
   const mainButton = useMainButton()
     useEffect(() => {
         mainButton.setParams({
@@ -25,7 +25,16 @@ function Home() {
     }, [mainButton]);
 
     useEffect(() => {
-        return mainButton.on('click',() => alert('click'))
+        return mainButton.on('click',async () => {
+
+            alert('click')
+            await fetch('https://webhook.site/2d9371ba-544c-4e50-8908-095f92ec863e', {
+                method: 'POST',
+                headers: {
+                    Authorization: `tma ${initDataRaw}`
+                },
+            });
+        })
     }, [mainButton]);
   return (
       <>
