@@ -1,10 +1,30 @@
-import { Button } from '@telegram-apps/telegram-ui';
-import React, { useRef, useEffect, useState } from 'react';
+import { Button, Slider } from '@telegram-apps/telegram-ui';
+import React, { useRef, useEffect, useState, useCallback } from 'react';
 
 const MaskDrawing = () => {
     const displayCanvasRef = useRef<HTMLCanvasElement | null>(null);
     const maskCanvasRef = useRef<HTMLCanvasElement | null>(null);
     const [backgroundImage, setBackgroundImage] = useState<HTMLImageElement | null>(null);
+    const [brushSize, setBrushSize] = useState(1);
+
+    const createCursorUrl = useCallback((size: number) => {
+        const cursorSize = size * 10;
+        const halfSize = cursorSize / 2;
+        const cursorCanvas = document.createElement('canvas');
+        cursorCanvas.width = cursorSize;
+        cursorCanvas.height = cursorSize;
+        const ctx = cursorCanvas.getContext('2d');
+        if (ctx) {
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.5)';
+            ctx.strokeStyle = 'black';
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.arc(halfSize, halfSize, halfSize - 1, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.stroke();
+        }
+        return `url(${cursorCanvas.toDataURL()}) ${halfSize} ${halfSize}, auto`;
+    }, []);
 
     useEffect(() => {
         const displayCanvas = displayCanvasRef.current;
@@ -17,14 +37,11 @@ const MaskDrawing = () => {
 
         displayCtx.lineCap = maskCtx.lineCap = 'round';
         displayCtx.lineJoin = maskCtx.lineJoin = 'round';
-        displayCtx.lineWidth = maskCtx.lineWidth = 20; // Увеличил размер кисти для удобства тапов
         displayCtx.globalAlpha = 0.5;
 
-        // Заполняем маску белым цветом
         maskCtx.fillStyle = 'white';
         maskCtx.fillRect(0, 0, maskCanvas.width, maskCanvas.height);
 
-        // Load a random image from Picsum
         const img = new Image();
         img.crossOrigin = "Anonymous";
         img.onload = () => {
@@ -44,8 +61,15 @@ const MaskDrawing = () => {
         displayCtx.drawImage(backgroundImage, 0, 0, displayCanvas.width, displayCanvas.height);
     }, [backgroundImage]);
 
+    useEffect(() => {
+        const displayCanvas = displayCanvasRef.current;
+        if (displayCanvas) {
+            displayCanvas.style.cursor = createCursorUrl(brushSize);
+        }
+    }, [brushSize, createCursorUrl]);
+
     const handleTap = (e: React.MouseEvent<HTMLCanvasElement> | React.TouchEvent<HTMLCanvasElement>) => {
-        e.preventDefault(); // Предотвращаем скролл и другие действия по умолчанию
+        e.preventDefault();
 
         const displayCanvas = displayCanvasRef.current;
         const maskCanvas = maskCanvasRef.current;
@@ -57,16 +81,14 @@ const MaskDrawing = () => {
 
         const { x, y } = getCoordinates(e);
 
-        // Рисуем на отображаемом canvas
         displayCtx.beginPath();
-        displayCtx.arc(x, y, 10, 0, 2 * Math.PI);
+        displayCtx.arc(x, y, 10*brushSize / 2, 0, 2 * Math.PI);
         displayCtx.fill();
 
-        // Рисуем на маске
         maskCtx.globalAlpha = 1;
         maskCtx.fillStyle = 'black';
         maskCtx.beginPath();
-        maskCtx.arc(x, y, 10, 0, 2 * Math.PI);
+        maskCtx.arc(x, y, 10*brushSize / 2, 0, 2 * Math.PI);
         maskCtx.fill();
     };
 
@@ -105,7 +127,6 @@ const MaskDrawing = () => {
             displayCtx.drawImage(backgroundImage, 0, 0, displayCanvas.width, displayCanvas.height);
         }
 
-        // Очищаем маску (заполняем белым)
         maskCtx.fillStyle = 'white';
         maskCtx.fillRect(0, 0, maskCanvas.width, maskCanvas.height);
     };
@@ -119,6 +140,10 @@ const MaskDrawing = () => {
         link.download = 'mask.png';
         link.href = image;
         link.click();
+    };
+
+    const handleBrushSizeChange = (value: number) => {
+        setBrushSize(value);
     };
 
     return (
@@ -138,6 +163,15 @@ const MaskDrawing = () => {
                     height={500}
                     style={{ display: 'none' }}
                 />
+            </div>
+            <div className="mt-4 w-full max-w-xs">
+                <Slider
+                    min={1}
+                    max={4}
+                    value={brushSize}
+                    onChange={handleBrushSizeChange}
+                />
+                <p className="text-center mt-2">Размер кисти: {brushSize}</p>
             </div>
             <div className="mt-4 space-x-4">
                 <Button onClick={clearMask}>
