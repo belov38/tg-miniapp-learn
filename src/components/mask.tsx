@@ -144,7 +144,7 @@ const MaskDrawing = () => {
                     ref={maskCanvasRef}
                     width={500}
                     height={500}
-                    className="hidden"
+                    style={{ display: 'none' }}
                 />
             </div>
             <div className="mt-4 space-x-4">
