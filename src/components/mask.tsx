@@ -4,8 +4,6 @@ import React, { useRef, useEffect, useState } from 'react';
 const MaskDrawing = () => {
     const displayCanvasRef = useRef<HTMLCanvasElement | null>(null);
     const maskCanvasRef = useRef<HTMLCanvasElement | null>(null);
-    const [isDrawing, setIsDrawing] = useState(false);
-    const lastPositionRef = useRef({ x: 0, y: 0 });
     const [backgroundImage, setBackgroundImage] = useState<HTMLImageElement | null>(null);
 
     useEffect(() => {
@@ -19,7 +17,7 @@ const MaskDrawing = () => {
 
         displayCtx.lineCap = maskCtx.lineCap = 'round';
         displayCtx.lineJoin = maskCtx.lineJoin = 'round';
-        displayCtx.lineWidth = maskCtx.lineWidth = 10;
+        displayCtx.lineWidth = maskCtx.lineWidth = 20; // Увеличил размер кисти для удобства тапов
         displayCtx.globalAlpha = 0.5;
 
         // Заполняем маску белым цветом
@@ -46,18 +44,8 @@ const MaskDrawing = () => {
         displayCtx.drawImage(backgroundImage, 0, 0, displayCanvas.width, displayCanvas.height);
     }, [backgroundImage]);
 
-    const startDrawing = (e: React.MouseEvent<HTMLCanvasElement> | React.TouchEvent<HTMLCanvasElement>) => {
-        setIsDrawing(true);
-        const { x, y } = getCoordinates(e);
-        lastPositionRef.current = { x, y };
-    };
-
-    const stopDrawing = () => {
-        setIsDrawing(false);
-    };
-
-    const draw = (e: React.MouseEvent<HTMLCanvasElement> | React.TouchEvent<HTMLCanvasElement>) => {
-        if (!isDrawing) return;
+    const handleTap = (e: React.MouseEvent<HTMLCanvasElement> | React.TouchEvent<HTMLCanvasElement>) => {
+        e.preventDefault(); // Предотвращаем скролл и другие действия по умолчанию
 
         const displayCanvas = displayCanvasRef.current;
         const maskCanvas = maskCanvasRef.current;
@@ -71,19 +59,15 @@ const MaskDrawing = () => {
 
         // Рисуем на отображаемом canvas
         displayCtx.beginPath();
-        displayCtx.moveTo(lastPositionRef.current.x, lastPositionRef.current.y);
-        displayCtx.lineTo(x, y);
-        displayCtx.stroke();
+        displayCtx.arc(x, y, 10, 0, 2 * Math.PI);
+        displayCtx.fill();
 
         // Рисуем на маске
         maskCtx.globalAlpha = 1;
-        maskCtx.strokeStyle = 'black';
+        maskCtx.fillStyle = 'black';
         maskCtx.beginPath();
-        maskCtx.moveTo(lastPositionRef.current.x, lastPositionRef.current.y);
-        maskCtx.lineTo(x, y);
-        maskCtx.stroke();
-
-        lastPositionRef.current = { x, y };
+        maskCtx.arc(x, y, 10, 0, 2 * Math.PI);
+        maskCtx.fill();
     };
 
     const getCoordinates = (e: React.MouseEvent<HTMLCanvasElement> | React.TouchEvent<HTMLCanvasElement>) => {
@@ -138,23 +122,15 @@ const MaskDrawing = () => {
     };
 
     return (
-        <div className="flex flex-col items-center w-fit">
+        <div className="flex flex-col items-center">
             <div className="relative">
                 <canvas
                     ref={displayCanvasRef}
                     width={500}
                     height={500}
-                    className="border border-gray-300 cursor-crosshair touch-none"
-                    onMouseDown={startDrawing}
-                    onMouseUp={stopDrawing}
-                    onMouseMove={draw}
-                    onMouseLeave={stopDrawing}
-                    onTouchStart={startDrawing}
-                    onTouchMove={(e) => {
-                        e.preventDefault();
-                        draw(e);
-                    }}
-                    onTouchEnd={stopDrawing}
+                    className="border border-gray-300 touch-none"
+                    onClick={handleTap}
+                    onTouchStart={handleTap}
                 />
                 <canvas
                     ref={maskCanvasRef}

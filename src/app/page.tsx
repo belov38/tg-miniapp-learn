@@ -1,6 +1,6 @@
 'use client';
 
-import {Section, Cell, Image, List, Text} from '@telegram-apps/telegram-ui';
+import {Section, Cell, Image, List, Text, Card} from '@telegram-apps/telegram-ui';
 
 import { Link } from '@/components/Link/Link';
 import { useMainButton } from '@telegram-apps/sdk-react';
@@ -24,17 +24,14 @@ function Home() {
     }, [mainButton]);
   return (
       <>
-          <MaskDrawing />
+
     <List>
         <Section
             header='Моя секция'
             footer='Футер'
         >
         <Cell>
-
-            <Text>
-                Длинный текст в ячейке. Пример сообщения от бота. И еще одно сообщение от бота. А это третье сообщение от бота.
-            </Text>
+            <Card><MaskDrawing /></Card>
         </Cell>
         </Section>
       {/*<Section*/}
