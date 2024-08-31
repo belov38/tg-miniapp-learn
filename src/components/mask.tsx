@@ -1,4 +1,4 @@
-import {Button} from '@telegram-apps/telegram-ui';
+import { Button } from '@telegram-apps/telegram-ui';
 import React, { useRef, useEffect, useState } from 'react';
 
 const MaskDrawing = () => {
@@ -46,7 +46,7 @@ const MaskDrawing = () => {
         displayCtx.drawImage(backgroundImage, 0, 0, displayCanvas.width, displayCanvas.height);
     }, [backgroundImage]);
 
-    const startDrawing = (e: React.MouseEvent<HTMLCanvasElement>) => {
+    const startDrawing = (e: React.MouseEvent<HTMLCanvasElement> | React.TouchEvent<HTMLCanvasElement>) => {
         setIsDrawing(true);
         const { x, y } = getCoordinates(e);
         lastPositionRef.current = { x, y };
@@ -56,7 +56,7 @@ const MaskDrawing = () => {
         setIsDrawing(false);
     };
 
-    const draw = (e: React.MouseEvent<HTMLCanvasElement>) => {
+    const draw = (e: React.MouseEvent<HTMLCanvasElement> | React.TouchEvent<HTMLCanvasElement>) => {
         if (!isDrawing) return;
 
         const displayCanvas = displayCanvasRef.current;
@@ -86,14 +86,24 @@ const MaskDrawing = () => {
         lastPositionRef.current = { x, y };
     };
 
-    const getCoordinates = (e: React.MouseEvent<HTMLCanvasElement>) => {
+    const getCoordinates = (e: React.MouseEvent<HTMLCanvasElement> | React.TouchEvent<HTMLCanvasElement>) => {
         const canvas = displayCanvasRef.current;
         if (!canvas) return { x: 0, y: 0 };
 
         const rect = canvas.getBoundingClientRect();
+        let clientX, clientY;
+
+        if ('touches' in e) {
+            clientX = e.touches[0].clientX;
+            clientY = e.touches[0].clientY;
+        } else {
+            clientX = e.clientX;
+            clientY = e.clientY;
+        }
+
         return {
-            x: e.clientX - rect.left,
-            y: e.clientY - rect.top
+            x: clientX - rect.left,
+            y: clientY - rect.top
         };
     };
 
@@ -134,11 +144,17 @@ const MaskDrawing = () => {
                     ref={displayCanvasRef}
                     width={500}
                     height={500}
-                    className="border border-gray-300 cursor-crosshair"
+                    className="border border-gray-300 cursor-crosshair touch-none"
                     onMouseDown={startDrawing}
                     onMouseUp={stopDrawing}
                     onMouseMove={draw}
                     onMouseLeave={stopDrawing}
+                    onTouchStart={startDrawing}
+                    onTouchMove={(e) => {
+                        e.preventDefault();
+                        draw(e);
+                    }}
+                    onTouchEnd={stopDrawing}
                 />
                 <canvas
                     ref={maskCanvasRef}
