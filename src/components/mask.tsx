@@ -1,5 +1,3 @@
-'use client';
-
 import { Button, Slider } from '@telegram-apps/telegram-ui';
 import React, { useRef, useEffect, useState, useCallback } from 'react';
 
@@ -8,6 +6,8 @@ const MaskDrawing = () => {
     const maskCanvasRef = useRef<HTMLCanvasElement | null>(null);
     const [backgroundImage, setBackgroundImage] = useState<HTMLImageElement | null>(null);
     const [brushSize, setBrushSize] = useState(4);
+    const [history, setHistory] = useState<ImageData[]>([]);
+    const [currentStep, setCurrentStep] = useState(-1);
 
     const createCursorUrl = useCallback((size: number) => {
         const cursorSize = size * 10;
@@ -43,6 +43,10 @@ const MaskDrawing = () => {
 
         maskCtx.fillStyle = 'white';
         maskCtx.fillRect(0, 0, maskCanvas.width, maskCanvas.height);
+
+        const initialState = maskCtx.getImageData(0, 0, maskCanvas.width, maskCanvas.height);
+        setHistory([initialState]);
+        setCurrentStep(0);
 
         const img = new Image();
         img.crossOrigin = "Anonymous";
@@ -92,6 +96,13 @@ const MaskDrawing = () => {
         maskCtx.beginPath();
         maskCtx.arc(x, y, 10*brushSize / 2, 0, 2 * Math.PI);
         maskCtx.fill();
+
+        // Save the new state to history
+        const newState = maskCtx.getImageData(0, 0, maskCanvas.width, maskCanvas.height);
+        const newHistory = history.slice(0, currentStep + 1);
+        newHistory.push(newState);
+        setHistory(newHistory);
+        setCurrentStep(currentStep + 1);
     };
 
     const getCoordinates = (e: React.MouseEvent<HTMLCanvasElement> | React.TouchEvent<HTMLCanvasElement>) => {
@@ -131,6 +142,11 @@ const MaskDrawing = () => {
 
         maskCtx.fillStyle = 'white';
         maskCtx.fillRect(0, 0, maskCanvas.width, maskCanvas.height);
+
+        // Reset history
+        const initialState = maskCtx.getImageData(0, 0, maskCanvas.width, maskCanvas.height);
+        setHistory([initialState]);
+        setCurrentStep(0);
     };
 
     const saveMask = () => {
@@ -146,6 +162,30 @@ const MaskDrawing = () => {
 
     const handleBrushSizeChange = (value: number) => {
         setBrushSize(value);
+    };
+
+    const undo = () => {
+        if (currentStep > 0) {
+            const maskCanvas = maskCanvasRef.current;
+            const displayCanvas = displayCanvasRef.current;
+            if (!maskCanvas || !displayCanvas) return;
+
+            const maskCtx = maskCanvas.getContext('2d');
+            const displayCtx = displayCanvas.getContext('2d');
+            if (!maskCtx || !displayCtx) return;
+
+            const prevStep = currentStep - 1;
+            maskCtx.putImageData(history[prevStep], 0, 0);
+
+            // Redraw the display canvas
+            displayCtx.clearRect(0, 0, displayCanvas.width, displayCanvas.height);
+            if (backgroundImage) {
+                displayCtx.drawImage(backgroundImage, 0, 0, displayCanvas.width, displayCanvas.height);
+            }
+            displayCtx.drawImage(maskCanvas, 0, 0);
+
+            setCurrentStep(prevStep);
+        }
     };
 
     return (
@@ -176,6 +216,9 @@ const MaskDrawing = () => {
                 <p className="text-center mt-2">Размер кисти: {brushSize}</p>
             </div>
             <div className="mt-4 space-x-4">
+                <Button onClick={undo} disabled={currentStep <= 0}>
+                    Отменить
+                </Button>
                 <Button onClick={clearMask}>
                     Очистить маску
                 </Button>

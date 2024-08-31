@@ -1,7 +1,7 @@
 'use client';
 
 import {Section, Cell, Image, List, Text, Card, } from '@telegram-apps/telegram-ui';
-import {useViewport} from '@telegram-apps/sdk-react';
+import {useViewport, useHapticFeedback} from '@telegram-apps/sdk-react';
 
 import { Link } from '@/components/Link/Link';
 import { useMainButton } from '@telegram-apps/sdk-react';
@@ -12,6 +12,8 @@ import MaskDrawing from "@/components/mask";
 
 function Home() {
   const viewPort = useViewport();
+  const hf = useHapticFeedback()
+
 
   const mainButton = useMainButton()
     useEffect(() => {
