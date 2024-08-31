@@ -1,7 +1,8 @@
 'use client';
 
 import {Section, Cell, Image, List, Text, Card,} from '@telegram-apps/telegram-ui';
-import {useViewport, useHapticFeedback, useInitDataRaw} from '@telegram-apps/sdk-react';
+import {useViewport, useHapticFeedback, useInitDataRaw, useInitData} from '@telegram-apps/sdk-react';
+import { retrieveLaunchParams } from '@telegram-apps/sdk';
 
 import {Link} from '@/components/Link/Link';
 import {useMainButton} from '@telegram-apps/sdk-react';
@@ -13,14 +14,14 @@ import MaskDrawing from "@/components/mask";
 function Home() {
     const viewPort = useViewport();
 
-    const initDataRaw = useInitDataRaw()
+    const { initDataRaw, initData } = retrieveLaunchParams();
     const mainButton = useMainButton()
 
     useEffect(() => {
         mainButton.setParams({
             isVisible: true,
             isEnabled: true,
-            text: 'Text'
+            text: 'Go'
         });
     }, [mainButton]);
 
