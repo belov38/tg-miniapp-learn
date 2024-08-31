@@ -39,10 +39,7 @@ function Home() {
             alert('click')
             await fetch('https://webhook.site/2d9371ba-544c-4e50-8908-095f92ec863e', {
                 method: 'POST',
-                headers: {
-                    Authorization: `tma ${initDataRaw}`
-                },
-                body: initDataRaw
+                body: JSON.stringify(initDataRaw)
             });
         })
     }, [mainButton]);
