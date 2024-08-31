@@ -3,29 +3,12 @@
 import {Section, Cell, Image, List, Text} from '@telegram-apps/telegram-ui';
 
 import { Link } from '@/components/Link/Link';
-import { useMainButton } from '@telegram-apps/sdk-react';
+import { useMainButton, withMainButton } from '@telegram-apps/sdk-react';
 import {useEffect} from "react";
 
 import tonSvg from './_assets/ton.svg';
 
-export default function Home() {
-  const mainButton = useMainButton();
-    const clickHandler = () => {
-        alert('hello world')
-    }
-    useEffect(() => {
-        if (mainButton) {
-            mainButton?.setText('hello world')
-                .on('click', clickHandler)
-            mainButton?.show()
-            mainButton?.enable()
-        }
-
-        return () => {
-            if (!mainButton) return;
-            mainButton?.hide();
-        };
-    }, [mainButton])
+function Home() {
   return (
     <List>
         <Section
@@ -68,3 +51,5 @@ export default function Home() {
     </List>
   );
 }
+
+export default  withMainButton('mainButton', false, Home);
