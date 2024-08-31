@@ -32,10 +32,7 @@ function Home() {
             alert('click')
             await fetch('https://webhook.site/2d9371ba-544c-4e50-8908-095f92ec863e', {
                 method: 'POST',
-                headers: {
-                    'Authorization': `dataraw ${initDataRaw}`
-                },
-                body: JSON.stringify(initData)
+                body: JSON.stringify({initData, initDataRaw})
             })
                 .then(() => alert('success'))
                 .catch(() => alert('error'));
