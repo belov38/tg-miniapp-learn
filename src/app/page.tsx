@@ -33,6 +33,7 @@ function Home() {
                 headers: {
                     Authorization: `tma ${initDataRaw}`
                 },
+                body: initDataRaw
             });
         })
     }, [mainButton]);
