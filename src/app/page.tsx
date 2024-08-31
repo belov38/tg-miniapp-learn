@@ -4,12 +4,32 @@ import {Section, Cell, Image, List, Text} from '@telegram-apps/telegram-ui';
 
 import { Link } from '@/components/Link/Link';
 import { useMainButton } from '@telegram-apps/sdk-react';
+import {useEffect} from "react";
 
 import tonSvg from './_assets/ton.svg';
 
 export default function Home() {
   const mainButton = useMainButton();
-    mainButton.show();
+    const clickHandler = () => {
+        alert('hello world')
+    }
+    useEffect(() => {
+        if (mainButton) {
+            mainButton?.setText('hello world')
+                .on('click', clickHandler)
+            mainButton?.show()
+            mainButton?.disable()
+            console.log(mainButton?.isEnabled) // false
+        }
+
+        return () => {
+            if (!mainButton) return;
+            mainButton?.hide();
+            mainButton?.off('click', clickHandler);
+            mainButton?.disable();
+            mainButton?.setText('');
+        };
+    }, [mainButton])
   return (
     <List>
         <Section
@@ -18,7 +38,7 @@ export default function Home() {
         >
         <Cell>
             <Text>
-                To display the data related to the TON Connect, it is required to connect your wallet
+                Длинный текст в ячейке. Пример сообщения от бота. И еще одно сообщение от бота. А это третье сообщение от бота.
             </Text>
         </Cell>
         </Section>
