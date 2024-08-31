@@ -7,6 +7,7 @@ import { useMainButton } from '@telegram-apps/sdk-react';
 
 import tonSvg from './_assets/ton.svg';
 import {useEffect} from "react";
+import MaskDrawing from "@/components/mask";
 
 function Home() {
   const mainButton = useMainButton()
@@ -22,12 +23,15 @@ function Home() {
         return mainButton.on('click',() => console.log('click'))
     }, [mainButton]);
   return (
+      <>
+          <MaskDrawing />
     <List>
         <Section
             header='Моя секция'
             footer='Футер'
         >
         <Cell>
+
             <Text>
                 Длинный текст в ячейке. Пример сообщения от бота. И еще одно сообщение от бота. А это третье сообщение от бота.
             </Text>
@@ -61,6 +65,7 @@ function Home() {
         </Link>
       </Section>
     </List>
+      </>
   );
 }
 
