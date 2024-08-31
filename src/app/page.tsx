@@ -18,16 +18,11 @@ export default function Home() {
             mainButton?.setText('hello world')
                 .on('click', clickHandler)
             mainButton?.show()
-            mainButton?.disable()
-            console.log(mainButton?.isEnabled) // false
         }
 
         return () => {
             if (!mainButton) return;
             mainButton?.hide();
-            mainButton?.off('click', clickHandler);
-            mainButton?.disable();
-            mainButton?.setText('');
         };
     }, [mainButton])
   return (
