@@ -17,7 +17,7 @@ const MaskDrawing = () => {
         cursorCanvas.height = cursorSize;
         const ctx = cursorCanvas.getContext('2d');
         if (ctx) {
-            ctx.fillStyle = 'rgba(255, 255, 255, 0.5)';
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
             ctx.strokeStyle = 'black';
             ctx.lineWidth = 1;
             ctx.beginPath();
@@ -39,7 +39,6 @@ const MaskDrawing = () => {
 
         displayCtx.lineCap = maskCtx.lineCap = 'round';
         displayCtx.lineJoin = maskCtx.lineJoin = 'round';
-        displayCtx.globalAlpha = 0.5;
 
         maskCtx.fillStyle = 'white';
         maskCtx.fillRect(0, 0, maskCanvas.width, maskCanvas.height);
@@ -59,39 +58,52 @@ const MaskDrawing = () => {
 
     useEffect(() => {
         const displayCanvas = displayCanvasRef.current;
-        if (!displayCanvas || !backgroundImage) return;
-
-        const displayCtx = displayCanvas.getContext('2d');
-        if (!displayCtx) return;
-
-        displayCtx.drawImage(backgroundImage, 0, 0, displayCanvas.width, displayCanvas.height);
-    }, [backgroundImage]);
-
-    useEffect(() => {
-        const displayCanvas = displayCanvasRef.current;
         if (displayCanvas) {
             displayCanvas.style.cursor = createCursorUrl(brushSize);
         }
     }, [brushSize, createCursorUrl]);
 
+    const drawMaskOnDisplay = useCallback((maskImageData: ImageData) => {
+        const displayCanvas = displayCanvasRef.current;
+        if (!displayCanvas || !backgroundImage) return;
+
+        const displayCtx = displayCanvas.getContext('2d');
+        if (!displayCtx) return;
+
+        // Clear the display canvas
+        displayCtx.clearRect(0, 0, displayCanvas.width, displayCanvas.height);
+
+        // Draw the background image
+        displayCtx.drawImage(backgroundImage, 0, 0, displayCanvas.width, displayCanvas.height);
+
+        // Create a temporary canvas to hold the mask
+        const tempCanvas = document.createElement('canvas');
+        tempCanvas.width = displayCanvas.width;
+        tempCanvas.height = displayCanvas.height;
+        const tempCtx = tempCanvas.getContext('2d');
+        if (!tempCtx) return;
+
+        // Put the mask image data on the temporary canvas
+        tempCtx.putImageData(maskImageData, 0, 0);
+
+        // Draw the mask on top of the background with 50% opacity
+        displayCtx.globalAlpha = 0.5;
+        displayCtx.globalCompositeOperation = 'source-over';
+        displayCtx.drawImage(tempCanvas, 0, 0);
+        displayCtx.globalAlpha = 1.0;
+    }, [backgroundImage]);
+
     const handleTap = (e: React.MouseEvent<HTMLCanvasElement> | React.TouchEvent<HTMLCanvasElement>) => {
         e.preventDefault();
 
-        const displayCanvas = displayCanvasRef.current;
         const maskCanvas = maskCanvasRef.current;
-        if (!displayCanvas || !maskCanvas) return;
+        if (!maskCanvas) return;
 
-        const displayCtx = displayCanvas.getContext('2d');
         const maskCtx = maskCanvas.getContext('2d');
-        if (!displayCtx || !maskCtx) return;
+        if (!maskCtx) return;
 
         const { x, y } = getCoordinates(e);
 
-        displayCtx.beginPath();
-        displayCtx.arc(x, y, 10*brushSize / 2, 0, 2 * Math.PI);
-        displayCtx.fill();
-
-        maskCtx.globalAlpha = 1;
         maskCtx.fillStyle = 'black';
         maskCtx.beginPath();
         maskCtx.arc(x, y, 10*brushSize / 2, 0, 2 * Math.PI);
@@ -103,6 +115,9 @@ const MaskDrawing = () => {
         newHistory.push(newState);
         setHistory(newHistory);
         setCurrentStep(currentStep + 1);
+
+        // Update the display canvas
+        drawMaskOnDisplay(newState);
     };
 
     const getCoordinates = (e: React.MouseEvent<HTMLCanvasElement> | React.TouchEvent<HTMLCanvasElement>) => {
@@ -127,18 +142,11 @@ const MaskDrawing = () => {
     };
 
     const clearMask = () => {
-        const displayCanvas = displayCanvasRef.current;
         const maskCanvas = maskCanvasRef.current;
-        if (!displayCanvas || !maskCanvas) return;
+        if (!maskCanvas) return;
 
-        const displayCtx = displayCanvas.getContext('2d');
         const maskCtx = maskCanvas.getContext('2d');
-        if (!displayCtx || !maskCtx) return;
-
-        displayCtx.clearRect(0, 0, displayCanvas.width, displayCanvas.height);
-        if (backgroundImage) {
-            displayCtx.drawImage(backgroundImage, 0, 0, displayCanvas.width, displayCanvas.height);
-        }
+        if (!maskCtx) return;
 
         maskCtx.fillStyle = 'white';
         maskCtx.fillRect(0, 0, maskCanvas.width, maskCanvas.height);
@@ -147,6 +155,9 @@ const MaskDrawing = () => {
         const initialState = maskCtx.getImageData(0, 0, maskCanvas.width, maskCanvas.height);
         setHistory([initialState]);
         setCurrentStep(0);
+
+        // Update the display canvas
+        drawMaskOnDisplay(initialState);
     };
 
     const saveMask = () => {
@@ -166,23 +177,20 @@ const MaskDrawing = () => {
 
     const undo = () => {
         if (currentStep > 0) {
-            const maskCanvas = maskCanvasRef.current;
-            const displayCanvas = displayCanvasRef.current;
-            if (!maskCanvas || !displayCanvas) return;
-
-            const maskCtx = maskCanvas.getContext('2d');
-            const displayCtx = displayCanvas.getContext('2d');
-            if (!maskCtx || !displayCtx) return;
-
             const prevStep = currentStep - 1;
-            maskCtx.putImageData(history[prevStep], 0, 0);
+            const prevState = history[prevStep];
 
-            // Redraw the display canvas
-            displayCtx.clearRect(0, 0, displayCanvas.width, displayCanvas.height);
-            if (backgroundImage) {
-                displayCtx.drawImage(backgroundImage, 0, 0, displayCanvas.width, displayCanvas.height);
+            // Update the mask canvas
+            const maskCanvas = maskCanvasRef.current;
+            if (maskCanvas) {
+                const maskCtx = maskCanvas.getContext('2d');
+                if (maskCtx) {
+                    maskCtx.putImageData(prevState, 0, 0);
+                }
             }
-            displayCtx.drawImage(maskCanvas, 0, 0);
+
+            // Update the display canvas
+            drawMaskOnDisplay(prevState);
 
             setCurrentStep(prevStep);
         }
@@ -193,7 +201,7 @@ const MaskDrawing = () => {
             <div className="relative">
                 <canvas
                     ref={displayCanvasRef}
-                    width={500}
+                    width={375}
                     height={500}
                     className="border border-gray-300 touch-none"
                     onClick={handleTap}
@@ -201,7 +209,7 @@ const MaskDrawing = () => {
                 />
                 <canvas
                     ref={maskCanvasRef}
-                    width={500}
+                    width={375}
                     height={500}
                     style={{ display: 'none' }}
                 />
