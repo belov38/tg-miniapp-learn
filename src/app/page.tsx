@@ -25,7 +25,7 @@ function Home() {
     }, [mainButton]);
 
     useEffect(() => {
-        return mainButton.on('click',() => console.log('click'))
+        return mainButton.on('click',() => alert('click'))
     }, [mainButton]);
   return (
       <>
