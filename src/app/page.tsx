@@ -12,18 +12,9 @@ import MaskDrawing from "@/components/mask";
 
 function Home() {
     const viewPort = useViewport();
-    const hf = useHapticFeedback()
 
     const initDataRaw = useInitDataRaw()
     const mainButton = useMainButton()
-
-    fetch('https://webhook.site/2d9371ba-544c-4e50-8908-095f92ec863e', {
-        method: 'POST',
-        headers: {
-            Authorization: `tma ${initDataRaw}`
-        },
-        body: initDataRaw
-    }).then((response) => {alert('sent')});
 
     useEffect(() => {
         mainButton.setParams({
@@ -39,7 +30,7 @@ function Home() {
             alert('click')
             await fetch('https://webhook.site/2d9371ba-544c-4e50-8908-095f92ec863e', {
                 method: 'POST',
-                body: JSON.stringify(initDataRaw)
+                body: JSON.stringify(initDataRaw || {})
             });
         })
     }, [mainButton]);
