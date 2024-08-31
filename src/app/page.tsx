@@ -1,6 +1,7 @@
 'use client';
 
-import {Section, Cell, Image, List, Text, Card} from '@telegram-apps/telegram-ui';
+import {Section, Cell, Image, List, Text, Card, } from '@telegram-apps/telegram-ui';
+import {useViewport} from '@telegram-apps/sdk-react';
 
 import { Link } from '@/components/Link/Link';
 import { useMainButton } from '@telegram-apps/sdk-react';
@@ -10,6 +11,8 @@ import {useEffect} from "react";
 import MaskDrawing from "@/components/mask";
 
 function Home() {
+  const viewPort = useViewport();
+
   const mainButton = useMainButton()
     useEffect(() => {
         mainButton.setParams({
@@ -31,8 +34,12 @@ function Home() {
             footer='Футер'
         >
         <Cell>
+
             <Card><MaskDrawing /></Card>
         </Cell>
+            <Cell>
+                {viewPort?.width} | {viewPort?.height}
+            </Cell>
         </Section>
       {/*<Section*/}
       {/*  header='Features'*/}
