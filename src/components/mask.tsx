@@ -1,20 +1,21 @@
 import {Button} from '@telegram-apps/telegram-ui';
-
-
 import React, { useRef, useEffect, useState } from 'react';
 
 const MaskDrawing = () => {
-    const displayCanvasRef = useRef(null);
-    const maskCanvasRef = useRef(null);
+    const displayCanvasRef = useRef<HTMLCanvasElement | null>(null);
+    const maskCanvasRef = useRef<HTMLCanvasElement | null>(null);
     const [isDrawing, setIsDrawing] = useState(false);
     const lastPositionRef = useRef({ x: 0, y: 0 });
-    const [backgroundImage, setBackgroundImage] = useState(null);
+    const [backgroundImage, setBackgroundImage] = useState<HTMLImageElement | null>(null);
 
     useEffect(() => {
         const displayCanvas = displayCanvasRef.current;
         const maskCanvas = maskCanvasRef.current;
+        if (!displayCanvas || !maskCanvas) return;
+
         const displayCtx = displayCanvas.getContext('2d');
         const maskCtx = maskCanvas.getContext('2d');
+        if (!displayCtx || !maskCtx) return;
 
         displayCtx.lineCap = maskCtx.lineCap = 'round';
         displayCtx.lineJoin = maskCtx.lineJoin = 'round';
@@ -36,14 +37,16 @@ const MaskDrawing = () => {
     }, []);
 
     useEffect(() => {
-        if (backgroundImage) {
-            const displayCanvas = displayCanvasRef.current;
-            const displayCtx = displayCanvas.getContext('2d');
-            displayCtx.drawImage(backgroundImage, 0, 0, displayCanvas.width, displayCanvas.height);
-        }
+        const displayCanvas = displayCanvasRef.current;
+        if (!displayCanvas || !backgroundImage) return;
+
+        const displayCtx = displayCanvas.getContext('2d');
+        if (!displayCtx) return;
+
+        displayCtx.drawImage(backgroundImage, 0, 0, displayCanvas.width, displayCanvas.height);
     }, [backgroundImage]);
 
-    const startDrawing = (e) => {
+    const startDrawing = (e: React.MouseEvent<HTMLCanvasElement>) => {
         setIsDrawing(true);
         const { x, y } = getCoordinates(e);
         lastPositionRef.current = { x, y };
@@ -53,13 +56,17 @@ const MaskDrawing = () => {
         setIsDrawing(false);
     };
 
-    const draw = (e) => {
+    const draw = (e: React.MouseEvent<HTMLCanvasElement>) => {
         if (!isDrawing) return;
 
         const displayCanvas = displayCanvasRef.current;
         const maskCanvas = maskCanvasRef.current;
+        if (!displayCanvas || !maskCanvas) return;
+
         const displayCtx = displayCanvas.getContext('2d');
         const maskCtx = maskCanvas.getContext('2d');
+        if (!displayCtx || !maskCtx) return;
+
         const { x, y } = getCoordinates(e);
 
         // Рисуем на отображаемом canvas
@@ -79,8 +86,10 @@ const MaskDrawing = () => {
         lastPositionRef.current = { x, y };
     };
 
-    const getCoordinates = (e) => {
+    const getCoordinates = (e: React.MouseEvent<HTMLCanvasElement>) => {
         const canvas = displayCanvasRef.current;
+        if (!canvas) return { x: 0, y: 0 };
+
         const rect = canvas.getBoundingClientRect();
         return {
             x: e.clientX - rect.left,
@@ -91,8 +100,11 @@ const MaskDrawing = () => {
     const clearMask = () => {
         const displayCanvas = displayCanvasRef.current;
         const maskCanvas = maskCanvasRef.current;
+        if (!displayCanvas || !maskCanvas) return;
+
         const displayCtx = displayCanvas.getContext('2d');
         const maskCtx = maskCanvas.getContext('2d');
+        if (!displayCtx || !maskCtx) return;
 
         displayCtx.clearRect(0, 0, displayCanvas.width, displayCanvas.height);
         if (backgroundImage) {
@@ -106,6 +118,8 @@ const MaskDrawing = () => {
 
     const saveMask = () => {
         const maskCanvas = maskCanvasRef.current;
+        if (!maskCanvas) return;
+
         const image = maskCanvas.toDataURL("image/png").replace("image/png", "image/octet-stream");
         const link = document.createElement('a');
         link.download = 'mask.png';
@@ -134,10 +148,10 @@ const MaskDrawing = () => {
                 />
             </div>
             <div className="mt-4 space-x-4">
-                <Button onClick={clearMask} variant="secondary">
+                <Button onClick={clearMask}>
                     Очистить маску
                 </Button>
-                <Button onClick={saveMask} variant="default">
+                <Button onClick={saveMask}>
                     Сохранить маску
                 </Button>
             </div>
