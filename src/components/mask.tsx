@@ -138,7 +138,7 @@ const MaskDrawing = () => {
     };
 
     return (
-        <div className="flex flex-col items-center">
+        <div className="flex flex-col items-center w-fit">
             <div className="relative">
                 <canvas
                     ref={displayCanvasRef}
