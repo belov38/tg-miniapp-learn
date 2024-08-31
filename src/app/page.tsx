@@ -27,7 +27,7 @@ function Home() {
     }, [mainButton]);
   return (
       <>
-
+          <MaskDrawing />
     <List>
         <Section
             header='Моя секция'
@@ -35,7 +35,7 @@ function Home() {
         >
         <Cell>
 
-            <Card><MaskDrawing /></Card>
+
         </Cell>
             <Cell>
                 {viewPort?.width} | {viewPort?.height}

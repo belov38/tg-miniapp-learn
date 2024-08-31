@@ -1,3 +1,5 @@
+'use client';
+
 import { Button, Slider } from '@telegram-apps/telegram-ui';
 import React, { useRef, useEffect, useState, useCallback } from 'react';
 
@@ -5,7 +7,7 @@ const MaskDrawing = () => {
     const displayCanvasRef = useRef<HTMLCanvasElement | null>(null);
     const maskCanvasRef = useRef<HTMLCanvasElement | null>(null);
     const [backgroundImage, setBackgroundImage] = useState<HTMLImageElement | null>(null);
-    const [brushSize, setBrushSize] = useState(1);
+    const [brushSize, setBrushSize] = useState(4);
 
     const createCursorUrl = useCallback((size: number) => {
         const cursorSize = size * 10;
