@@ -1,14 +1,27 @@
 'use client';
 
-import { Section, Cell, Image, List } from '@telegram-apps/telegram-ui';
+import {Section, Cell, Image, List, Text} from '@telegram-apps/telegram-ui';
 
 import { Link } from '@/components/Link/Link';
+import { useMainButton } from '@telegram-apps/sdk-react';
 
 import tonSvg from './_assets/ton.svg';
 
 export default function Home() {
+  const mainButton = useMainButton();
+    mainButton.show();
   return (
     <List>
+        <Section
+            header='Моя секция'
+            footer='Футер'
+        >
+        <Cell>
+            <Text>
+                To display the data related to the TON Connect, it is required to connect your wallet
+            </Text>
+        </Cell>
+        </Section>
       <Section
         header='Features'
         footer='You can use these pages to learn more about features, provided by Telegram Mini Apps and other useful projects'
